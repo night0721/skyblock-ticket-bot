@@ -36,6 +36,8 @@ module.exports = {
     },
   ],
   run: async (client, interaction, args) => {
+    if (process.env.SERVER_ID !== interaction.guild.id)
+      return interaction.followUp({ content: "No" });
     const dat = await fetch(
       `https://api.mojang.com/users/profiles/minecraft/${args[1]}`
     ).then(res => res.json());

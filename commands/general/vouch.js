@@ -19,6 +19,8 @@ module.exports = {
     },
   ],
   run: async (client, interaction, args) => {
+    if (process.env.SERVER_ID !== interaction.guild.id)
+      return interaction.followUp({ content: "No" });
     const user = interaction.options.getUser("user");
     interaction.followUp({
       content: "Vouch sent!",

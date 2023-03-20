@@ -5,11 +5,15 @@ const {
   Permissions,
   PermissionsBitField,
 } = require("discord.js");
+const dotenv = require("dotenv");
+dotenv.config();
 
 module.exports = {
   name: "ticket",
   description: "Create a ticket",
   run: async (client, interaction, args) => {
+    if (process.env.SERVER_ID !== interaction.guild.id)
+      return interaction.followUp({ content: "No" });
     if (
       !interaction.member.permissions.has([
         PermissionsBitField.Flags.ManageGuild,
@@ -24,7 +28,7 @@ module.exports = {
         new EmbedBuilder({
           title: "Ticket",
           description:
-            "Please create a ticket using the dropdown menu below\n\n{❓} Support\n\n{💰} Buy Coins\n\n{🤑} Sell Coins\n\n{👤} Buy Account\n\n{👥} Sell Account\n\n{🩸} Account Carries",
+            "Please create a ticket using the dropdown menu below\n\n{❓} Support\n\n{💰} Buy Coins\n\n{🤑} Sell Coins\n\n{👤} Buy Account\n\n{👥} Sell Account\n\n{🩸} Account Carries\n\n{<:1082348528401137754:1082348528401137754>} Currency Conversion\n\n{<a:NitroSkyshop:1087443807374676068>} Nitro Service",
           timestamp: new Date(),
           color: 0x02023a,
           footer: { text: client.user.username },
@@ -71,6 +75,18 @@ module.exports = {
                 emoji: "🩸",
                 description: "Get an account carried",
                 value: "accountcarries",
+              },
+              {
+                label: "Currency Conversion",
+                emoji: "<:1082348528401137754:1082348528401137754>",
+                description: "Convert some currency",
+                value: "conversion",
+              },
+              {
+                label: "Nitro Service",
+                emoji: "<a:NitroSkyshop:1087443807374676068>",
+                description: "Get a nitro service",
+                value: "nitroservice",
               }
             )
         ),

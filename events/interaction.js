@@ -14,6 +14,8 @@ const {
 const fs = require("fs");
 const id = require("../id.json");
 const config = require("../config");
+const dotenv = require("dotenv");
+dotenv.config();
 let closing = false;
 client.on("interactionCreate", async interaction => {
   if (interaction.isCommand()) {
@@ -48,9 +50,13 @@ client.on("interactionCreate", async interaction => {
     interaction.member = interaction.guild.members.cache.get(
       interaction.user.id
     );
+    if (process.env.SERVER_ID !== interaction.guild.id)
+      return interaction.followUp({ content: "No" });
     cmd.run(client, interaction, args).catch(e => sendE(e, interaction));
   }
   if (interaction.isButton()) {
+    if (process.env.SERVER_ID !== interaction.guild.id)
+      return interaction.followUp({ content: "No" });
     if (interaction.customId == "buybutton") {
       await interaction.deferReply({ ephemeral: true }).catch(() => {});
       createChannel(interaction, "buyaccount", interaction.user.username);
@@ -104,6 +110,8 @@ client.on("interactionCreate", async interaction => {
     }
   }
   if (interaction.isStringSelectMenu()) {
+    if (process.env.SERVER_ID !== interaction.guild.id)
+      return interaction.followUp({ content: "No" });
     await interaction.deferReply({ ephemeral: true }).catch(() => {});
     await createChannel(
       interaction,
@@ -112,12 +120,15 @@ client.on("interactionCreate", async interaction => {
     );
     interaction.followUp({ content: "Ticket created!", ephemeral: true });
   }
-  if (interaction.isModalSubmit())
+  if (interaction.isModalSubmit()) {
+    if (process.env.SERVER_ID !== interaction.guild.id)
+      return interaction.followUp({ content: "No" });
     if (interaction.customId == "closemodal") {
       await interaction.deferReply({ ephemeral: true }).catch(() => {});
       close(interaction, interaction.fields.getTextInputValue("closereason"));
       interaction.channel.delete();
     }
+  }
 });
 function close(interaction, reason) {
   var embed = new EmbedBuilder({
@@ -125,7 +136,7 @@ function close(interaction, reason) {
     fields: [
       {
         name: "Ticket ID",
-        value: interaction.channel.name.split("-")[3],
+        value: interaction.channel.name.split("-")[2],
         inline: true,
       },
       {
@@ -159,8 +170,8 @@ function close(interaction, reason) {
     embeds: [embed],
     files: [
       new AttachmentBuilder(
-        "./transcripts/" + interaction.channel.name.split("-")[3] + ".txt",
-        { name: interaction.channel.name.split("-")[3] + ".txt" }
+        "./transcripts/" + interaction.channel.name.split("-")[2] + ".txt",
+        { name: interaction.channel.name.split("-")[2] + ".txt" }
       ),
     ],
   });
@@ -169,8 +180,8 @@ function close(interaction, reason) {
       embeds: [embed],
       files: [
         new AttachmentBuilder(
-          "./transcripts/" + interaction.channel.name.split("-")[3] + ".txt",
-          { name: interaction.channel.name.split("-")[3] + ".txt" }
+          "./transcripts/" + interaction.channel.name.split("-")[2] + ".txt",
+          { name: interaction.channel.name.split("-")[2] + ".txt" }
         ),
       ],
     });
@@ -180,7 +191,7 @@ function close(interaction, reason) {
 }
 async function createChannel(interaction, reason, name) {
   var channel = await interaction.guild.channels.create({
-    name: "ticket-" + name + "-" + reason + "-" + id.id,
+    name: "ticket-" + reason + "-" + id.id,
     type: ChannelType.GuildText,
     parent: config.ticket_category,
     permissionOverwrites: [
@@ -233,6 +244,8 @@ async function createChannel(interaction, reason, name) {
   else if (reason == "buyaccount") str = "Buy an account";
   else if (reason == "sellaccount") str = "Sell an account";
   else if (reason == "accountcarries") str = "Account carry";
+  else if (reason == "conversion") str = "Conversion";
+  else if (reason == "nitroservice") str = "Nitro service";
   interaction.guild.channels.cache
     .get(channel.id)
     .setTopic(interaction.user.id);
@@ -290,8 +303,7 @@ function writeJson() {
 }
 client.on("messageCreate", async message => {
   if (message.channel.parentId != config.ticket_category) return;
-  //read transcripts folder and create the file if it doesn't exist
-  var transcript = `./transcripts/${message.channel.name.split("-")[3]}.txt`;
+  var transcript = `./transcripts/${message.channel.name.split("-")[2]}.txt`;
   if (!fs.existsSync(transcript)) {
     fs.writeFile(transcript, "", function (err) {
       if (err) {
