@@ -9,6 +9,7 @@ const {
   TextInputBuilder,
   ModalBuilder,
   AttachmentBuilder,
+  PermissionFlagsBits,
 } = require("discord.js");
 const fs = require("fs");
 const id = require("../id.json");
@@ -182,6 +183,47 @@ async function createChannel(interaction, reason, name) {
     name: "ticket-" + name + "-" + reason + "-" + id.id,
     type: ChannelType.GuildText,
     parent: config.ticket_category,
+    permissionOverwrites: [
+      {
+        id: "1082026290065965106",
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.AttachFiles,
+        ],
+      },
+      {
+        id: "1081991548734033943",
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.AttachFiles,
+        ],
+      },
+      {
+        id: "1082026291047432202",
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.AttachFiles,
+        ],
+      },
+      {
+        id: interaction.user.id,
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.AttachFiles,
+        ],
+      },
+      {
+        id: interaction.guild.roles.everyone,
+        deny: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+        ],
+      },
+    ],
   });
   writeJson();
   var str = "";

@@ -47,6 +47,14 @@ module.exports = {
       `https://sky.shiiyu.moe/api/v2/profile/${args[1]}`
     ).then(res => res.json());
     console.log(skycrypt);
+    if (skycrypt.error) {
+      return interaction.followUp({
+        content:
+          skycrypt.error.length > 1024
+            ? skycrypt.error.slice(0, 1021) + "..."
+            : skycrypt.error,
+      });
+    }
     var profile_index = 0;
     var profiles = Object.keys(skycrypt.profiles);
     interaction.deleteReply();
