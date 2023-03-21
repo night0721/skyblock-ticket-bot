@@ -57,6 +57,11 @@ module.exports = {
             : skycrypt.error,
       });
     }
+    if (!data.success) {
+      return interaction.followUp({
+        content: "Invalid API Key",
+      });
+    }
     var profile_index = 0;
     var profiles = Object.keys(skycrypt.profiles);
     interaction.deleteReply();
@@ -85,6 +90,8 @@ module.exports = {
 
       collector.on("collect", async i => {
         if (i.user.id === interaction.user.id) {
+          console.log(i.customId);
+          console.log(data);
           profile_index = pros.indexOf(i.customId);
           const profile = data.profiles[profile_index];
           const networth = await getNetworth(
